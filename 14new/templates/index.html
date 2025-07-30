@@ -1,0 +1,1384 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Teletalk CDR Portal</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #fff;
+            min-height: 100vh;
+            margin: 0;
+        }
+
+        .container {
+            width: 100vw;
+            min-height: 100vh;
+            margin: 0;
+            padding: 0;
+            border-radius: 0;
+            box-shadow: none;
+            background: none;
+            position: relative;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #71bd44 0%, #5fae3a 100%);
+            color: white;
+            padding: 30px 40px 30px 40px;
+            text-align: center;
+            position: relative;
+            width: 100vw;
+            min-height: 120px;
+            box-sizing: border-box;
+            border-radius: 0;
+        }
+
+        .header h1 {
+            font-size: 28px;
+            margin-bottom: 5px;
+            font-weight: 600;
+        }
+
+        .header p {
+            opacity: 0.9;
+            font-size: 14px;
+        }
+
+        /* .logo {
+
+        } */
+        .logo img {
+            width: 48px;
+            height: 48px;
+            object-fit: contain;
+            display: block;
+            position: absolute;
+            left: 30px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 60px;
+            height: 60px;
+            background: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            color: #71bd44;
+            font-size: 20px;
+        }
+
+        .logout-btn {
+            position: absolute;
+            right: 30px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: rgba(255, 255, 255, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            color: white;
+            padding: 8px 16px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.3s ease;
+            display: none;
+        }
+
+        .logout-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        .screen {
+            display: none;
+            padding: 40px;
+            min-height: 500px;
+        }
+
+        .screen.active {
+            display: block;
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #333;
+            font-size: 14px;
+        }
+
+        .form-group input, .form-group select {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid #444;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            background: #f8f9fa;
+        }
+
+        .form-group input:focus, .form-group select:focus {
+            outline: none;
+            border-color: #71bd44;
+            background: white;
+            box-shadow: 0 0 0 3px rgba(113, 189, 68, 0.1);
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #71bd44 0%, #5fae3a 100%);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            width: 100%;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(113, 189, 68, 0.3);
+        }
+
+        .btn:active {
+            transform: translateY(0);
+        }
+
+        .btn.btn-secondary {
+            background: linear-gradient(135deg, #71bd44 0%, #5fae3a 100%);
+            color: #fff;
+            width: auto;
+            padding: 12px 28px;
+            font-size: 18px;
+            font-weight: bold;
+            margin-right: 10px;
+            border: none;
+            border-radius: 12px;
+            box-shadow: 0 4px 16px rgba(113,189,68,0.10);
+            transition: all 0.3s cubic-bezier(.4,2,.3,1);
+        }
+
+        .btn.btn-secondary:hover {
+            background: linear-gradient(135deg, #5fae3a 0%, #71bd44 100%);
+            color: #fff;
+            box-shadow: 0 8px 32px rgba(113,189,68,0.18), 0 2px 8px rgba(60,60,60,0.10);
+            transform: scale(1.04) translateY(-2px);
+        }
+
+        .btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .otp-inputs {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+        }
+
+        .otp-input {
+            width: 50px !important;
+            height: 50px;
+            text-align: center;
+            font-size: 20px;
+            font-weight: bold;
+            border-radius: 8px;
+        }
+
+        .message {
+            padding: 12px 16px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            font-weight: 500;
+            font-size: 16px;
+            opacity: 1;
+            transition: opacity 0.3s;
+            animation: fadeIn 0.5s;
+            min-height: 24px;
+            text-align: center;
+            z-index: 10;
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        }
+
+        .message.success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .message.error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .card-container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            align-items: flex-start;
+            gap: 32px 32px;
+            margin-top: 40px;
+            width: 100%;
+        }
+
+        .card {
+            background: linear-gradient(135deg, #71bd44 0%, #5fae3a 100%);
+            border: 2px solid #fff;
+            border-radius: 20px;
+            padding: 32px 28px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(.4,2,.3,1);
+            position: relative;
+            overflow: hidden;
+            color: #111;
+            font-weight: bold;
+            box-shadow: 0 8px 32px 0 rgba(60,60,60,0.10), 0 1.5px 6px 0 rgba(113,189,68,0.10);
+            margin: 0 auto;
+            max-width: 340px;
+            min-height: 120px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .card:hover {
+            transform: scale(1.04) translateY(-8px);
+            box-shadow: 0 16px 40px rgba(113, 189, 68, 0.18), 0 2px 8px rgba(60,60,60,0.10);
+            border-color: #333;
+            background: linear-gradient(135deg, #5fae3a 0%, #71bd44 100%);
+        }
+
+        .card:hover::before {
+            display: none;
+        }
+
+        .card-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 5px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .user-info {
+            background: none;
+            padding: 15px 20px;
+            border-radius: 0;
+            margin-bottom: 20px;
+            font-size: 14px;
+            color: #6c757d;
+        }
+
+        .welcome-message {
+            text-align: center;
+            font-size: 18px;
+            color: #495057;
+            margin-bottom: 10px;
+        }
+
+        .service-form {
+            max-width: 600px;
+            margin: 0 auto;
+            background: none;
+            box-shadow: none;
+        }
+
+        .service-form h2 {
+            text-align: center;
+            margin-bottom: 30px;
+            color: #333;
+            font-size: 24px;
+        }
+
+        .navigation-buttons {
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        .results-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            background: none;
+            border-radius: 0;
+            overflow: visible;
+            box-shadow: none;
+        }
+
+        .results-table th {
+            background: #f3f3f3;
+            color: #333;
+            padding: 15px 12px;
+            text-align: left;
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        .results-table td {
+            padding: 12px;
+            border-bottom: 1px solid #e1e5e9;
+            font-size: 13px;
+            background: none;
+        }
+
+        .results-table tr:hover {
+            background: #f8f9fa;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #6c757d;
+            background: none;
+        }
+
+        .loading::after {
+            content: '';
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #71bd44;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-left: 10px;
+            background: none;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .radio-group {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 15px;
+            margin-top: 10px;
+        }
+
+        .radio-option {
+            display: flex;
+            align-items: center;
+            padding: 10px 15px;
+            border: 2px solid #e1e5e9;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: #f8f9fa;
+            box-shadow: none;
+        }
+
+        .radio-option:hover {
+            border-color: #71bd44;
+            background: rgba(113, 189, 68, 0.1);
+        }
+
+        .radio-option.selected {
+            border-color: #71bd44;
+            background: linear-gradient(135deg, #eaffea 0%, #d6f5d6 100%);
+            box-shadow: 0 2px 8px rgba(113,189,68,0.08);
+        }
+
+        .radio-option input {
+            margin-right: 8px;
+            width: auto !important;
+        }
+
+        .radio-option label {
+            margin: 0 !important;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        .phone-message-center-flex {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            margin-bottom: 0;
+        }
+        .phone-message-center {
+            width: 100%;
+            max-width: 600px;
+            margin: 0 auto;
+            text-align: center;
+        }
+        .phone-form-outer {
+            width: 100%;
+            max-width: 600px;
+            margin: 0 auto;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .phone-loading-flex {
+            width: 100%;
+            display: flex;
+            justify-content: center;
+        }
+        .phone-form-group {
+            width: 100%;
+        }
+        .phone-label {
+            font-size: 1.2em;
+            font-weight: bold;
+            text-align: center;
+            width: 100%;
+            display: block;
+        }
+        .phone-input {
+            text-align: center;
+            font-size: 1.1em;
+        }
+        .phone-btn {
+            width: 100%;
+            font-size: 1.1em;
+        }
+        .phone-info-text {
+            text-align: center;
+            margin-top: 20px;
+            color: #6c757d;
+            font-size: 16px;
+            font-weight: bold;
+        }
+        .otp-panel-center {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            max-width: 420px;
+            margin: 0 auto;
+        }
+        .otp-label-center {
+            font-size: 1.3em;
+            font-weight: bold;
+            text-align: center;
+            margin-bottom: 18px;
+            width: 100%;
+        }
+        .otp-inputs-margin {
+            margin-bottom: 18px;
+        }
+        .otp-btn-narrow {
+            width: 320px;
+            max-width: 100%;
+            margin: 0 auto 10px auto;
+            align-self: center;
+            font-size: 1.1em;
+            display: block;
+        }
+        .btn-back-modern {
+            background: linear-gradient(135deg, #5fae3a 0%, #71bd44 100%);
+            color: #fff;
+            width: 180px;
+            padding: 12px 0;
+            font-size: 1.1em;
+            font-weight: bold;
+            border: none;
+            border-radius: 8px;
+            box-shadow: 0 4px 16px rgba(113,189,68,0.10);
+            margin: 10px auto 0 auto;
+            display: block;
+            text-align: center;
+            transition: all 0.3s cubic-bezier(.4,2,.3,1);
+        }
+        .btn-back-modern:hover {
+            background: linear-gradient(135deg, #71bd44 0%, #5fae3a 100%);
+            color: #fff;
+            box-shadow: 0 8px 32px rgba(113,189,68,0.18), 0 2px 8px rgba(60,60,60,0.10);
+            transform: scale(1.04) translateY(-2px);
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                margin: 0;
+                border-radius: 0;
+                min-height: auto;
+            }
+
+            .header {
+                padding: 15px 10px;
+            }
+
+            .header h1 {
+                font-size: 24px;
+            }
+
+            .logo {
+                width: 50px;
+                height: 50px;
+                font-size: 16px;
+                left: 20px;
+            }
+
+            .logout-btn {
+                right: 20px;
+                padding: 6px 12px;
+                font-size: 12px;
+            }
+
+            .screen {
+                padding: 10px;
+            }
+
+            .form-row {
+                grid-template-columns: 1fr;
+                gap: 15px;
+            }
+
+            .card-container {
+                grid-template-columns: 1fr;
+                gap: 15px;
+            }
+
+            .otp-inputs {
+                gap: 8px;
+            }
+
+            .otp-input {
+                width: 40px !important;
+                height: 40px;
+                font-size: 18px;
+            }
+
+            .radio-group {
+                grid-template-columns: 1fr;
+                gap: 10px;
+            }
+
+            .results-table {
+                font-size: 12px;
+            }
+
+            .results-table th,
+            .results-table td {
+                padding: 8px 6px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="logo"><img src="/static/teletalk.png" alt="Logo"></div>
+            <h1>Teletalk CDR Portal</h1>
+            <p>Secure Access to Call Detail Records</p>
+            <button class="logout-btn" id="logoutBtn" onclick="logout()">Logout</button>
+        </div>
+
+        <!-- Screen 1: Phone Number Input -->
+        <div class="screen active" id="phoneScreen">
+            <div class="phone-message-center-flex">
+                <div id="phoneMessage" class="phone-message-center"></div>
+                <div class="phone-loading-flex"><div id="phoneLoading" class="phone-loading-center"></div></div>
+            </div>
+            <div class="phone-form-outer">
+                <div class="form-group phone-form-group">
+                    <label for="phoneNumber" class="phone-label">Enter Your Phone Number</label>
+                    <input type="tel" id="phoneNumber" class="phone-input" placeholder="01XXXXXXXXX or 8801XXXXXXXXX" maxlength="14">
+                </div>
+                <button class="btn phone-btn" onclick="sendOTP()">Send OTP</button>
+                <div class="phone-info-text">
+                    <p>Authorized numbers only • Secure SMS verification</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Screen 2: OTP Verification -->
+        <div class="screen" id="otpScreen">
+            <div id="otpMessage" style="text-align:center;"></div>
+            <div class="otp-panel-center">
+                <label class="otp-label-center">Enter 6-Digit OTP</label>
+                <div class="otp-inputs otp-inputs-margin">
+                    <input type="text" class="otp-input" maxlength="1" oninput="moveToNext(this, 0)" placeholder="•" title="Enter digit 1 of OTP">
+                    <input type="text" class="otp-input" maxlength="1" oninput="moveToNext(this, 1)" placeholder="•" title="Enter digit 2 of OTP">
+                    <input type="text" class="otp-input" maxlength="1" oninput="moveToNext(this, 2)" placeholder="•" title="Enter digit 3 of OTP">
+                    <input type="text" class="otp-input" maxlength="1" oninput="moveToNext(this, 3)" placeholder="•" title="Enter digit 4 of OTP">
+                    <input type="text" class="otp-input" maxlength="1" oninput="moveToNext(this, 4)" placeholder="•" title="Enter digit 5 of OTP">
+                    <input type="text" class="otp-input" maxlength="1" oninput="moveToNext(this, 5)" placeholder="•" title="Enter digit 6 of OTP">
+                </div>
+                <button type="button" class="btn otp-btn-narrow" onclick="verifyOTP()">Verify OTP</button>
+                <button class="btn btn-back-modern" onclick="showScreen('phoneScreen')">← Back</button>
+            </div>
+        </div>
+
+        <!-- Screen 3: Dashboard -->
+        <div class="screen" id="dashboardScreen">
+            <div class="user-info">
+                <strong>Logged in as:</strong> <span id="userPhone"></span>
+            </div>
+            <div class="welcome-message">
+                Choose a CDR service from the options below
+            </div>
+            <div class="card-container">
+                <div class="card" onclick="showService('14_column_cdr')">
+                    <div class="card-title">14 Column CDR</div>
+                    <div class="card-title">(A Party Search)</div>
+                </div>
+                <div class="card" onclick="showService('msisdn_to_imei')">
+                    <div class="card-title">MSISDN to IMEI</div>
+                </div>
+                <div class="card" onclick="showService('imei_to_msisdn')">
+                    <div class="card-title">IMEI to MSISDN</div>
+                </div>
+                <div class="card" onclick="showService('lac_cell_cdr')">
+                    <div class="card-title">LAC and CELL CDR</div>
+                </div>
+                <div class="card" onclick="showService('foreign_number_cdr')">
+                    <div class="card-title">Foreign Number CDR</div>
+                    <div class="card-title">(B Party Search)</div>
+                </div>
+                <div class="card" onclick="showService('cgi_msisdn_cdr')">
+                    <div class="card-title">CGI MSISDN CDR</div>
+                </div>
+                <!-- Retailer Location card removed -->
+            </div>
+        </div>
+
+        <!-- Screen 4: Service Forms -->
+        <div class="screen" id="serviceScreen">
+            <div class="service-form">
+                <div id="resultsMessage" style="margin-bottom: 18px;"></div>
+                <h2 id="serviceTitle">CDR Search</h2>
+                <div class="navigation-buttons">
+                    <button class="btn btn-secondary" onclick="showDashboard()">← Back to Dashboard</button>
+                </div>
+
+                <!-- 14 Column CDR Form -->
+                <div id="form_14_column_cdr" class="service-form-content" style="display: none;">
+                    <div class="form-group">
+                        <label for="msisdn_14">MSISDN:</label>
+                        <input type="text" id="msisdn_14" placeholder="Enter phone number">
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="start_date_14">Start Date:</label>
+                            <input type="date" id="start_date_14">
+                        </div>
+                        <div class="form-group">
+                            <label for="end_date_14">End Date:</label>
+                            <input type="date" id="end_date_14">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Call Type Filter:</label>
+                        <div class="radio-group">
+                            <div class="radio-option selected" onclick="selectRadio(this, '14_filter', 'all')">
+                                <input type="radio" name="14_filter" value="all" checked>
+                                <label>All</label>
+                            </div>
+                            <div class="radio-option" onclick="selectRadio(this, '14_filter', 'moc&mtc')">
+                                <input type="radio" name="14_filter" value="moc&mtc">
+                                <label>MOC & MTC</label>
+                            </div>
+                            <div class="radio-option" onclick="selectRadio(this, '14_filter', 'moc')">
+                                <input type="radio" name="14_filter" value="moc">
+                                <label>MOC</label>
+                            </div>
+                            <div class="radio-option" onclick="selectRadio(this, '14_filter', 'mtc')">
+                                <input type="radio" name="14_filter" value="mtc">
+                                <label>MTC</label>
+                            </div>
+                            <div class="radio-option" onclick="selectRadio(this, '14_filter', 'smsmo&smsmt')">
+                                <input type="radio" name="14_filter" value="smsmo&smsmt">
+                                <label>SMS MO & MT</label>
+                            </div>
+                            <div class="radio-option" onclick="selectRadio(this, '14_filter', 'smsmo')">
+                                <input type="radio" name="14_filter" value="smsmo">
+                                <label>SMS MO</label>
+                            </div>
+                            <div class="radio-option" onclick="selectRadio(this, '14_filter', 'smsmt')">
+                                <input type="radio" name="14_filter" value="smsmt">
+                                <label>SMS MT</label>
+                            </div>
+                        </div>
+                    </div>
+                    <button class="btn" onclick="searchCDR('14_column_cdr')">Search CDR</button>
+                </div>
+
+                <!-- MSISDN to IMEI Form -->
+                <div id="form_msisdn_to_imei" class="service-form-content" style="display: none;">
+                    <div class="form-group">
+                        <label for="msisdn_imei">MSISDN:</label>
+                        <input type="text" id="msisdn_imei" placeholder="Enter phone number">
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="start_date_imei">Start Date:</label>
+                            <input type="date" id="start_date_imei">
+                        </div>
+                        <div class="form-group">
+                            <label for="end_date_imei">End Date:</label>
+                            <input type="date" id="end_date_imei">
+                        </div>
+                    </div>
+                    <button class="btn" onclick="searchCDR('msisdn_to_imei')">Search IMEI</button>
+                </div>
+
+                <!-- IMEI to MSISDN Form -->
+                <div id="form_imei_to_msisdn" class="service-form-content" style="display: none;">
+                    <div class="form-group">
+                        <label for="imei_msisdn">IMEI:</label>
+                        <input type="text" id="imei_msisdn" placeholder="Enter IMEI number">
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="start_date_msisdn">Start Date:</label>
+                            <input type="date" id="start_date_msisdn">
+                        </div>
+                        <div class="form-group">
+                            <label for="end_date_msisdn">End Date:</label>
+                            <input type="date" id="end_date_msisdn">
+                        </div>
+                    </div>
+                    <button class="btn" onclick="searchCDR('imei_to_msisdn')">Search MSISDN</button>
+                </div>
+
+                <!-- LAC Cell CDR Form -->
+                <div id="form_lac_cell_cdr" class="service-form-content" style="display: none;">
+                    <div class="form-group">
+                        <label for="date_lac">Date:</label>
+                        <input type="date" id="date_lac">
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="lac_input">LAC:</label>
+                            <input type="text" id="lac_input" placeholder="Enter LAC">
+                        </div>
+                        <div class="form-group">
+                            <label for="cell_input">CELL:</label>
+                            <input type="text" id="cell_input" placeholder="Enter CELL">
+                        </div>
+                    </div>
+                    <button class="btn" onclick="searchCDR('lac_cell_cdr')">Search CDR</button>
+                </div>
+
+                <!-- Foreign Number CDR Form -->
+                <div id="form_foreign_number_cdr" class="service-form-content" style="display: none;">
+                    <div class="form-group">
+                        <label for="foreign_msisdn">Foreign MSISDN:</label>
+                        <input type="text" id="foreign_msisdn" placeholder="Enter foreign number">
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="start_date_foreign">Start Date:</label>
+                            <input type="date" id="start_date_foreign">
+                        </div>
+                        <div class="form-group">
+                            <label for="end_date_foreign">End Date:</label>
+                            <input type="date" id="end_date_foreign">
+                        </div>
+                    </div>
+                    <button class="btn" onclick="searchCDR('foreign_number_cdr')">Search CDR</button>
+                </div>
+
+                <!-- CGI MSISDN CDR Form -->
+                <div id="form_cgi_msisdn_cdr" class="service-form-content" style="display: none;">
+                    <div class="form-group">
+                        <label for="cgi_input">CGI:</label>
+                        <input type="text" id="cgi_input" placeholder="Enter CGI">
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="start_date_cgi">Start Date:</label>
+                            <input type="date" id="start_date_cgi">
+                        </div>
+                        <div class="form-group">
+                            <label for="end_date_cgi">End Date:</label>
+                            <input type="date" id="end_date_cgi">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Call Type Filter:</label>
+                        <div class="radio-group">
+                            <div class="radio-option selected" onclick="selectRadio(this, 'cgi_filter', 'all')">
+                                <input type="radio" name="cgi_filter" value="all" checked>
+                                <label>All</label>
+                            </div>
+                            <div class="radio-option" onclick="selectRadio(this, 'cgi_filter', 'moc&mtc')">
+                                <input type="radio" name="cgi_filter" value="moc&mtc">
+                                <label>MOC & MTC</label>
+                            </div>
+                            <div class="radio-option" onclick="selectRadio(this, 'cgi_filter', 'moc')">
+                                <input type="radio" name="cgi_filter" value="moc">
+                                <label>MOC</label>
+                            </div>
+                            <div class="radio-option" onclick="selectRadio(this, 'cgi_filter', 'mtc')">
+                                <input type="radio" name="cgi_filter" value="mtc">
+                                <label>MTC</label>
+                            </div>
+                            <div class="radio-option" onclick="selectRadio(this, 'cgi_filter', 'smsmo&smsmt')">
+                                <input type="radio" name="cgi_filter" value="smsmo&smsmt">
+                                <label>SMS MO & MT</label>
+                            </div>
+                            <div class="radio-option" onclick="selectRadio(this, 'cgi_filter', 'smsmo')">
+                                <input type="radio" name="cgi_filter" value="smsmo">
+                                <label>SMS MO</label>
+                            </div>
+                            <div class="radio-option" onclick="selectRadio(this, 'cgi_filter', 'smsmt')">
+                                <input type="radio" name="cgi_filter" value="smsmt">
+                                <label>SMS MT</label>
+                            </div>
+                        </div>
+                    </div>
+                    <button class="btn" onclick="searchCDR('cgi_msisdn_cdr')">Search CDR</button>
+                </div>
+
+                <!-- Retailer Location Form removed -->
+            </div>
+        </div>
+
+                <!-- Screen 5: Results Display -->
+        <div class="screen" id="resultsScreen">
+            <div class="navigation-buttons">
+                <button class="btn btn-secondary" onclick="showDashboard()">← Back to Dashboard</button>
+                <button class="btn btn-secondary" id="downloadCsvBtn" style="display: none;" onclick="downloadCSV()">Download CSV</button>
+            </div>
+            <h2 id="resultsTitle" style="margin-bottom: 20px; color: #333;">CDR Results</h2>
+            <div id="resultsMessage"></div>
+            <div id="loadingIndicator" class="loading" style="display: none;">Loading results...</div>
+            <div id="resultsContainer" style="display: none;">
+                <div id="resultsSummary" style="background: #e9ecef; padding: 10px; border-radius: 8px; margin-bottom: 20px; font-size: 14px;">
+                    Showing <span id="resultCount">0</span> records
+                </div>
+                <div class="table-responsive">
+                    <table class="results-table" id="resultsTable">
+                        <thead>
+                            <tr id="resultsHeader">
+                                <!-- Headers will be populated dynamically -->
+                            </tr>
+                        </thead>
+                        <tbody id="resultsBody">
+                            <!-- Results will be populated dynamically -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Global variables
+        let currentService = '';
+        let currentResults = [];
+        let currentColumns = [];
+
+        // Screen navigation functions
+        function showScreen(screenId) {
+            // Hide all screens
+            document.querySelectorAll('.screen').forEach(screen => {
+                screen.classList.remove('active');
+            });
+
+            // Show the requested screen
+            document.getElementById(screenId).classList.add('active');
+
+            // Show logout button on authenticated screens
+            if (screenId === 'dashboardScreen' || screenId === 'serviceScreen' || screenId === 'resultsScreen') {
+                document.querySelector('.logout-btn').style.display = 'block';
+            } else {
+                document.querySelector('.logout-btn').style.display = 'none';
+            }
+        }
+
+        function showDashboard() {
+            showScreen('dashboardScreen');
+            document.getElementById('userPhone').textContent = localStorage.getItem('userPhone') || '';
+        }
+
+        function showService(serviceName) {
+            currentService = serviceName;
+
+            // Reset all forms
+            document.querySelectorAll('.service-form-content').forEach(form => {
+                form.style.display = 'none';
+            });
+
+            // Show the selected service form
+            document.getElementById(`form_${serviceName}`).style.display = 'block';
+
+            // Set service title
+            const titles = {
+                '14_column_cdr': '14 Column CDR (A Party Search)',
+                'msisdn_to_imei': 'MSISDN to IMEI',
+                'imei_to_msisdn': 'IMEI to MSISDN',
+                'lac_cell_cdr': 'LAC and CELL CDR',
+                'foreign_number_cdr': 'Foreign Number CDR (B Party Search)',
+                'cgi_msisdn_cdr': 'CGI MSISDN CDR'
+            };
+
+            document.getElementById('serviceTitle').textContent = titles[serviceName] || 'CDR Search';
+
+            // Show service screen
+            showScreen('serviceScreen');
+        }
+
+        // OTP functions
+        function sendOTP() {
+            const phoneInput = document.getElementById('phoneNumber');
+            const phoneMessage = document.getElementById('phoneMessage');
+            const phone = phoneInput.value.trim();
+
+            if (!phone) {
+                showMessage(phoneMessage, 'Please enter a phone number', 'error');
+                return;
+            }
+
+            // Basic validation
+            const phoneRegex = /^(\+?880|01)\d{9,10}$/;
+            if (!phoneRegex.test(phone)) {
+                showMessage(phoneMessage, 'Please enter a valid Bangladeshi phone number', 'error');
+                return;
+            }
+
+            // Send OTP request
+            phoneMessage.innerHTML = '<div class="loading">Sending OTP...</div>';
+
+            fetch('/send_otp', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ phone: phone })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    localStorage.setItem('userPhone', phone);
+                    phoneMessage.innerHTML = '';
+
+                    const otpInputs = document.querySelectorAll('.otp-input');
+                    otpInputs.forEach(input => {
+                        input.value = '';
+                    });
+
+                    showScreen('otpScreen');
+                    showMessage(document.getElementById('otpMessage'), 'OTP sent successfully. Please check your SMS.', 'success');
+
+                    // Auto-focus first OTP input
+                    document.querySelector('.otp-input').focus();
+                } else {
+                    showMessage(phoneMessage, data.message, 'error');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                showMessage(phoneMessage, 'Failed to send OTP. Please try again.', 'error');
+            });
+        }
+
+        function verifyOTP() {
+            const otpInputs = document.querySelectorAll('.otp-input');
+            const otpMessage = document.getElementById('otpMessage');
+            const phone = localStorage.getItem('userPhone');
+
+            // Get OTP value
+            let otp = '';
+            otpInputs.forEach(input => {
+                otp += input.value;
+            });
+
+            if (otp.length !== 6) {
+                showMessage(otpMessage, 'Please enter a valid 6-digit OTP', 'error');
+                return;
+            }
+
+            // Verify OTP
+            otpMessage.innerHTML = '<div class="loading">Verifying OTP...</div>';
+
+            fetch('/verify_otp', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ phone: phone, otp: otp })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    document.getElementById('userPhone').textContent = phone;
+
+                    const otpInputs = document.querySelectorAll('.otp-input');
+                    otpInputs.forEach(input => {
+                        input.value = '';
+                    });
+                    otpMessage.innerHTML = '';
+
+                    showDashboard();
+                } else {
+                    showMessage(otpMessage, data.message, 'error');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                showMessage(otpMessage, 'Failed to verify OTP. Please try again.', 'error');
+            });
+        }
+
+        function searchCDR(serviceName) {
+            const serviceForm = document.getElementById(`form_${serviceName}`);
+            const resultsMessage = document.getElementById('resultsMessage');
+            const loadingIndicator = document.getElementById('loadingIndicator');
+            const resultsContainer = document.getElementById('resultsContainer');
+
+            // Collect form data based on service
+            let formData = {};
+
+            switch(serviceName) {
+                case '14_column_cdr':
+                    formData = {
+                        msisdn: document.getElementById('msisdn_14').value,
+                        start_date: document.getElementById('start_date_14').value,
+                        end_date: document.getElementById('end_date_14').value,
+                        radio_filter: document.querySelector('#form_14_column_cdr input[name="14_filter"]:checked').value
+                    };
+                    break;
+                case 'msisdn_to_imei':
+                    formData = {
+                        msisdn: document.getElementById('msisdn_imei').value,
+                        start_date: document.getElementById('start_date_imei').value,
+                        end_date: document.getElementById('end_date_imei').value
+                    };
+                    break;
+                case 'imei_to_msisdn':
+                    formData = {
+                        imei: document.getElementById('imei_msisdn').value,
+                        start_date: document.getElementById('start_date_msisdn').value,
+                        end_date: document.getElementById('end_date_msisdn').value
+                    };
+                    break;
+                case 'lac_cell_cdr':
+                    formData = {
+                        lac: document.getElementById('lac_input').value,
+                        cell: document.getElementById('cell_input').value,
+                        date: document.getElementById('date_lac').value
+                    };
+                    break;
+                case 'foreign_number_cdr':
+                    formData = {
+                        msisdn: document.getElementById('foreign_msisdn').value,
+                        start_date: document.getElementById('start_date_foreign').value,
+                        end_date: document.getElementById('end_date_foreign').value
+                    };
+                    break;
+                case 'cgi_msisdn_cdr':
+                    formData = {
+                        cgi: document.getElementById('cgi_input').value,
+                        start_date: document.getElementById('start_date_cgi').value,
+                        end_date: document.getElementById('end_date_cgi').value,
+                        radio_filter: document.querySelector('#form_cgi_msisdn_cdr input[name="cgi_filter"]:checked').value
+                    };
+                    break;
+                case 'retailer_location':
+                    formData = {
+                        msisdn: document.getElementById('retailer_msisdn').value,
+                        start_date: document.getElementById('start_date_retailer').value,
+                        end_date: document.getElementById('end_date_retailer').value
+                    };
+                    break;
+            }
+
+            // Validate form data with user-friendly messages
+            for (const [key, value] of Object.entries(formData)) {
+                if (!value) {
+                    let fieldLabel = '';
+                    switch(key) {
+                        case 'msisdn': fieldLabel = 'number'; break;
+                        case 'imei': fieldLabel = 'IMEI'; break;
+                        case 'lac': fieldLabel = 'LAC'; break;
+                        case 'cell': fieldLabel = 'CELL'; break;
+                        case 'cgi': fieldLabel = 'CGI'; break;
+                        case 'start_date': fieldLabel = 'start date'; break;
+                        case 'end_date': fieldLabel = 'end date'; break;
+                        case 'date': fieldLabel = 'date'; break;
+                        default: fieldLabel = key.replace('_', ' ');
+                    }
+                    showMessage(resultsMessage, `Please enter ${fieldLabel}`, 'error');
+                    return;
+                }
+            }
+
+            // Show loading state
+            loadingIndicator.style.display = 'block';
+            resultsContainer.style.display = 'none';
+            resultsMessage.innerHTML = '';
+
+            // Call the appropriate API
+            fetch(`/api/${serviceName}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(formData)
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    displayResults(serviceName, data.columns, data.data);
+                } else {
+                    showMessage(resultsMessage, 'Failed to fetch results: ' + (data.message || 'Unknown error'), 'error');
+                    loadingIndicator.style.display = 'none';
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                showMessage(resultsMessage, 'Failed to fetch results. Please try again.', 'error');
+                loadingIndicator.style.display = 'none';
+            });
+        }
+
+        function displayResults(serviceName, columns, data) {
+            const resultsHeader = document.getElementById('resultsHeader');
+            const resultsBody = document.getElementById('resultsBody');
+            const loadingIndicator = document.getElementById('loadingIndicator');
+            const resultsContainer = document.getElementById('resultsContainer');
+            const resultCount = document.getElementById('resultCount');
+            const downloadCsvBtn = document.getElementById('downloadCsvBtn');
+
+            // Clear previous results
+            resultsHeader.innerHTML = '';
+            resultsBody.innerHTML = '';
+
+            // Store results for CSV download
+            currentColumns = columns;
+            currentResults = data;
+
+            // Update result count
+            resultCount.textContent = data.length;
+
+            // Show/hide download button
+            downloadCsvBtn.style.display = data.length > 0 ? 'inline-block' : 'none';
+
+            // Populate headers
+            columns.forEach(column => {
+                const th = document.createElement('th');
+                th.textContent = formatHeaderName(column);
+                resultsHeader.appendChild(th);
+            });
+
+            // Populate data rows
+            if (data.length === 0) {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `<td colspan="${columns.length}" style="text-align: center; padding: 20px;">
+                    No results found for the selected criteria
+                </td>`;
+                resultsBody.appendChild(tr);
+            } else {
+                data.forEach(row => {
+                    const tr = document.createElement('tr');
+                    row.forEach(cell => {
+                        const td = document.createElement('td');
+                        td.textContent = cell || '';
+                        tr.appendChild(td);
+                    });
+                    resultsBody.appendChild(tr);
+                });
+            }
+
+            // Set results title
+            const titles = {
+                '14_column_cdr': '14 Column CDR Results',
+                'msisdn_to_imei': 'MSISDN to IMEI Results',
+                'imei_to_msisdn': 'IMEI to MSISDN Results',
+                'lac_cell_cdr': 'LAC and CELL CDR Results',
+                'foreign_number_cdr': 'Foreign Number CDR Results',
+                'cgi_msisdn_cdr': 'CGI MSISDN CDR Results'
+            };
+
+            document.getElementById('resultsTitle').textContent = titles[serviceName] || 'CDR Results';
+
+            // Show results
+            loadingIndicator.style.display = 'none';
+            resultsContainer.style.display = 'block';
+
+            // Show results screen
+            showScreen('resultsScreen');
+        }
+
+        function downloadCSV() {
+            if (currentResults.length === 0) return;
+
+            const filename = `${currentService}_results_${new Date().toISOString().slice(0, 10)}.csv`;
+
+            fetch('/download_csv', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    csv_data: currentResults,
+                    columns: currentColumns,
+                    filename: filename
+                })
+            })
+            .then(response => response.blob())
+            .then(blob => {
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = filename;
+                document.body.appendChild(a);
+                a.click();
+                a.remove();
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Failed to download CSV file');
+            });
+        }
+
+        function logout() {
+            fetch('/logout')
+                .then(() => {
+                    localStorage.removeItem('userPhone');
+                    showScreen('phoneScreen');
+                    document.getElementById('phoneNumber').value = '';
+                    document.getElementById('phoneMessage').innerHTML = '';
+                })
+                .catch(error => {
+                    console.error('Logout error:', error);
+                    localStorage.removeItem('userPhone');
+                    showScreen('phoneScreen');
+                });
+        }
+
+        // Helper functions
+        function showMessage(element, message, type) {
+            element.className = `message ${type}`;
+            element.style.display = 'block';
+            element.style.opacity = 1;
+            element.textContent = message;
+
+            // Auto-hide success messages only
+            if (type === 'success') {
+                setTimeout(() => {
+                    element.style.opacity = 0;
+                    setTimeout(() => {
+                        element.textContent = '';
+                        element.style.display = 'none';
+                    }, 300);
+                }, 5000);
+            }
+        }
+
+        function formatHeaderName(header) {
+            // Convert database column names to readable format
+            if (header === 'M04_MSISDNAPARTY') return 'A Party';
+            if (header === 'M05_MSISDNBPARTY') return 'B Party';
+            if (header === 'M07_ANSWERTIMESTAMP') return 'Start Time';
+            if (header === 'M08_CALLDUR') return 'Call Duration';
+            if (header === 'M01_CALLTYPE') return 'Call Type';
+            if (header === 'M09_LOCATION') return 'Cell ID';
+            if (header === 'M03_IMEI') return 'IMEI';
+            if (header === 'M02_IMSI') return 'IMSI';
+
+            // Convert snake_case to Title Case
+            return header
+                .replace(/_/g, ' ')
+                .replace(/\b\w/g, l => l.toUpperCase());
+        }
+
+        function moveToNext(input, index) {
+            // Only allow numbers
+            input.value = input.value.replace(/[^0-9]/g, '');
+
+            // Move to next input if a number is entered
+            if (input.value && index < 5) {
+                document.querySelectorAll('.otp-input')[index + 1].focus();
+            }
+
+            // Auto-submit when all OTP digits are entered
+            // const otpInputs = document.querySelectorAll('.otp-input');
+            // let otpComplete = true;
+            // for (let i = 0; i < 6; i++) {
+            //     if (!otpInputs[i].value) {
+            //         otpComplete = false;
+            //         break;
+            //     }
+            // }
+
+            // if (otpComplete) {
+            //     verifyOTP();
+            // }
+        }
+
+        function selectRadio(element, groupName, value) {
+            // Remove selected class from all options in the group
+            const allOptions = document.querySelectorAll(`input[name='${groupName}']`);
+            allOptions.forEach(input => {
+                if (input.closest('.radio-option')) {
+                    input.closest('.radio-option').classList.remove('selected');
+                }
+            });
+
+            // Add selected class to clicked option
+            element.classList.add('selected');
+
+            // Update radio input
+            const radioInput = element.querySelector('input');
+            radioInput.checked = true;
+        }
+
+        // Initialize the app
+        document.addEventListener('DOMContentLoaded', function() {
+            // Set current date as max for date inputs
+            const today = new Date().toISOString().split('T')[0];
+            document.querySelectorAll('input[type="date"]').forEach(input => {
+                input.max = today;
+            });
+
+            // OTP input handling
+            document.querySelectorAll('.otp-input').forEach((input, index) => {
+                input.addEventListener('input', function() {
+                    moveToNext(this, index);
+                });
+
+                input.addEventListener('keydown', function(e) {
+                    // Allow backspace to go to previous input
+                    if (e.key === 'Backspace' && this.value === '' && index > 0) {
+                        document.querySelectorAll('.otp-input')[index - 1].focus();
+                    }
+                });
+            });
+
+            // Auto-fill current date for LAC/CELL CDR
+            const lacDateInput = document.getElementById('date_lac');
+            if (lacDateInput) {
+                lacDateInput.value = today;
+            }
+        });
+    </script>
+</body>
+</html>
